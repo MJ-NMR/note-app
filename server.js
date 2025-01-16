@@ -1,5 +1,5 @@
-#!/usr/bin/node
-const express = require('express');
+#!/usr/bin/env node
+const express = require("express");
 const sqlite3 = require('sqlite3');
 const app = express();
 
@@ -13,9 +13,7 @@ const db = new sqlite3.Database('./database.db', (err) => {
 });
 
 app.get('/', (req, res) => {
-	res.write('<h1>notebook server</h1>');
-	console.log('GET main');
-
+	console.log(`GET main Time: ${Date.now()}`);
 	const user = req.query.name;
 	const id = req.query.id;
 	if(user || id){
@@ -29,19 +27,26 @@ app.get('/', (req, res) => {
 						if(err){
 							console.log('Error happen while retreving from the database');
 						}else{
-							res.write(JSON.srtingify(rows.body));
-							res.end();
+							if(rows){
+								res.end(JSON.srtingify(rows.body));
+							}else{
+								res.end('You don\'t have any notes')
+							}
 						}
 					});
+				}else{
+					res.end('There no user found')
 				}
 			}
 		});
+	}else{
+		res.end('notebook server')
 	}
 });
 
 // Routes
-const usersRoute = require('./routes/users.js');
-const productsRoute = require('./routes/products');
+const usersRoute  = require('./routes/users.js');
+const productsRoute = require('./routes/products.js');
 
 app.use('/users', usersRoute);
 app.use('/products', productsRoute);
